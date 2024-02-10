@@ -17,7 +17,7 @@ class Habitacion(models.Model):
         db_table='habitacion'
 
 class Trabajador(User):
-    salario=models.FloatField()
+    pass
 
 class Administrador(User):
     
