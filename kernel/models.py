@@ -7,9 +7,9 @@ class Habitacion(models.Model):
         'independiente':'single',
         'boble':'double',
     }
-    numero = models.CharField(max_length=10, unique=True)
+    numero = models.IntegerField(unique=True)
     tipo = models.CharField(max_length=50,choices=tipo_habitacion)
-    precio_por_noche = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_por_noche = models.IntegerField()
     disponible = models.BooleanField(default=True)
     descripcion = models.TextField()
     imagen = models.ImageField(upload_to='images')

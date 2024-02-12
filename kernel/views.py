@@ -1,16 +1,46 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializers import HabitacionSerializer,ReservaSerializer
+from .serializers import HabitacionSerializer,ReservaSerializer,UserSerializer,UserLoginSerializer
 from .models import Habitacion,Reserva
 from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
-
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
 #User
-class UserList(APIView):
-    pass
-class UserDetail(APIView):
-    pass
+class RegisterView(APIView):
+    @swagger_auto_schema(
+        operation_summary='Resgistrarse',
+        request_body=UserSerializer,
+        responses={201:UserSerializer()},
+    )
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginView(APIView):
+    @swagger_auto_schema(
+        operation_summary='Iniciar Sesion',
+        request_body=UserLoginSerializer,
+        responses={201:UserLoginSerializer()},
+    )
+    def post(self, request):
+        serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+            user = authenticate(username=username, password=password)
+            if user:
+                # Usuario autenticado correctamente
+                return Response({'message': 'Inicio de sesión exitoso'}, status=status.HTTP_200_OK)
+            else:
+                # Credenciales inválidas
+                return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 #Habitacion
 class HabitacionList(APIView):
@@ -18,22 +48,17 @@ class HabitacionList(APIView):
         operation_summary='Listar Habitaciones',
         responses={200:HabitacionSerializer(many=True)},
     )
-    def listar_habitacion(self,request):
-        try:
-           habitaciones=Habitacion.objects.all()
-           serializer=HabitacionSerializer(habitaciones,many=True)
-           if serializer.is_valid():
-               serializer.save()
-               return Response(serializer.data,status=status.HTTP_200_OK)
-        except:
-            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    def get(self,request):
+        habitaciones=Habitacion.objects.all()
+        serializer=HabitacionSerializer(habitaciones,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
         
     @swagger_auto_schema(
         operation_summary='Crear Habitacion',
         request_body=HabitacionSerializer,
         responses={201:HabitacionSerializer()},
     )
-    def crear_habitacion(self,request):
+    def post(self,request):
         nueva_habitacion=HabitacionSerializer(data=request.data)
         if nueva_habitacion.is_valid():
             nueva_habitacion.save()
@@ -51,7 +76,7 @@ class HabitacionDetail(APIView):
         operation_summary='Eliminar Habitacion',
         responses={204:HabitacionSerializer() },
     )
-    def eliminar_habitacion(self,pk):
+    def delete(self,pk):
         habitacion=self.get_object(pk)
         try :
             habitacion.delete()
@@ -62,7 +87,7 @@ class HabitacionDetail(APIView):
         operation_summary='Buscar Habitacion',
         responses={200:HabitacionSerializer() } , 
     )
-    def buscar_habitacion(self,pk):
+    def get_detail(self,pk):
         habitacion=self.get_object(pk)
         serializer=HabitacionSerializer(habitacion)
         if serializer.is_valid():
@@ -75,7 +100,7 @@ class HabitacionDetail(APIView):
         request_body=HabitacionSerializer,
         responses={200:HabitacionSerializer() },
     )
-    def actualizar_habitacion(self,request,pk):
+    def put(self,request,pk):
         habitacion=self.get_object(pk)
         serializer=HabitacionSerializer(habitacion,data=request.data)
         if serializer.is_valid():
@@ -88,7 +113,7 @@ class ReservaList(APIView):
         operation_summary='Listar Reserva',
         responses={200:ReservaSerializer(many=True)}, 
     )
-    def listar_reserva(self):
+    def get(self):
         try:
            reservas=Reserva.objects.all()
            serializer=ReservaSerializer(reservas,many=True)
@@ -103,7 +128,7 @@ class ReservaList(APIView):
         request_body=ReservaSerializer,
         responses={201:ReservaSerializer()},  
     )
-    def crear_reserva(self,request):
+    def post(self,request):
         try:
             nueva_reserva=ReservaSerializer(data=request.data)
             if nueva_reserva.is_valid():
@@ -123,7 +148,7 @@ class ReservaDetail(APIView):
         operation_summary='Eliminar Reserva',
         responses={204:ReservaSerializer()},
     )
-    def eliminar_reserva(self,pk):
+    def delete(self,pk):
         reserva=self.get_object(pk)
         try :
             reserva.delete()
@@ -134,7 +159,7 @@ class ReservaDetail(APIView):
         operation_summary='Buscar Reserva',
         responses={200:ReservaSerializer()},
     )
-    def buscar_reserva(self,pk):
+    def get_detail(self,pk):
         reserva=self.get_object(pk)
         serializer=ReservaSerializer(reserva)
         if serializer.is_valid():
@@ -147,7 +172,7 @@ class ReservaDetail(APIView):
         request_body=ReservaSerializer,
         responses={200:ReservaSerializer()},
     )
-    def actualizar_reserva(self,request,pk):
+    def put(self,request,pk):
         reserva=self.get_object(pk)
         serializer=ReservaSerializer(reserva,data=request.data)
         if serializer.is_valid():
