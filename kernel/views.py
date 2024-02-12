@@ -13,7 +13,7 @@ class UserDetail(APIView):
 
 #Habitacion
 class HabitacionList(APIView):
-    def list_habitacion(self,request):
+    def listar_habitacion(self,request):
         try:
            habitaciones=Habitacion.objects.all()
            serializer=HabitacionSerializer(habitaciones,many=True)
@@ -23,7 +23,7 @@ class HabitacionList(APIView):
         except:
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
-    def create_habitacion(self,request):
+    def crear_habitacion(self,request):
         try:
             nueva_habitacion=HabitacionSerializer(data=request.data)
             if nueva_habitacion.is_valid():
@@ -39,6 +39,28 @@ class HabitacionDetail(APIView):
         except Habitacion.DoesNotExist:
             status.HTTP_404_NOT_FOUND
 
+    def eliminar_habitacion(self,request,pk):
+        habitacion=self.get_object(pk)
+        try :
+            habitacion.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except: raise status.HTTP_204_NO_CONTENT
+        
+    def buscar_habitacion(self,pk):
+        habitacion=self.get_object(pk)
+        serializer=HabitacionSerializer(habitacion)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def actualizar_habitacion(self,request,pk):
+        habitacion=self.get_object(pk)
+        serializer=HabitacionSerializer(habitacion,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 #Reserva
 class ReservaList(APIView):
     pass
