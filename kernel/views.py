@@ -31,6 +31,7 @@ class HabitacionList(APIView):
                 return Response(nueva_habitacion.data,status=status.HTTP_201_CREATED)
         except:
             return Response(nueva_habitacion.errors,status=status.HTTP_400_BAD_REQUEST)
+        
 class HabitacionDetail(APIView):
     def get_object(self,pk):
         try:
