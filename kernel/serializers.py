@@ -14,8 +14,8 @@ class HabitacionSerializer(serializers.ModelSerializer):
         fields = ['id', 'numero', 'tipo', 'precio_por_noche', 'disponible', 'descripcion', 'imagen']
 
 class ReservaSerializer(serializers.ModelSerializer):
-    habitaciones = HabitacionSerializer()  # Representa la relación con Habitacion
-    cliente = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())  # Representa la relación con User
+    habitaciones = HabitacionSerializer()  
+    cliente = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())  
     class Meta:
         model = Reserva
         fields = ['id', 'cliente', 'habitaciones', 'fecha_inicio', 'fecha_fin', 'precio_total']
