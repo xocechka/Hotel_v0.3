@@ -16,7 +16,7 @@ class UserDetail(APIView):
 class HabitacionList(APIView):
     @swagger_auto_schema(
         operation_summary='Listar Habitaciones',
-        #responses={200:HabitacionSerializer(many=True) }  
+        responses={200:HabitacionSerializer(many=True) }  
     )
     def listar_habitacion(self,request):
         try:
@@ -30,7 +30,7 @@ class HabitacionList(APIView):
         
     @swagger_auto_schema(
         operation_summary='Crear Habitacion',
-        #responses={200:HabitacionSerializer(many=True) }  
+        responses={201:HabitacionSerializer()}  
     )
     def crear_habitacion(self,request):
         try:
@@ -50,7 +50,7 @@ class HabitacionDetail(APIView):
 
     @swagger_auto_schema(
         operation_summary='Eliminar Habitacion',
-        #responses={200:HabitacionSerializer(many=True) }  
+        responses={204:HabitacionSerializer() }  
     )
     def eliminar_habitacion(self,request,pk):
         habitacion=self.get_object(pk)
@@ -61,7 +61,7 @@ class HabitacionDetail(APIView):
     
     @swagger_auto_schema(
         operation_summary='Buscar Habitacion',
-        #responses={200:HabitacionSerializer(many=True) }  
+        responses={200:HabitacionSerializer() }  
     )
     def buscar_habitacion(self,pk):
         habitacion=self.get_object(pk)
@@ -73,7 +73,8 @@ class HabitacionDetail(APIView):
     
     @swagger_auto_schema(
         operation_summary='Actualizar Habitacion',
-        #responses={200:HabitacionSerializer(many=True) }  
+        request_body=HabitacionSerializer,
+        responses={200:HabitacionSerializer() } 
     )
     def actualizar_habitacion(self,request,pk):
         habitacion=self.get_object(pk)
