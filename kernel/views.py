@@ -110,7 +110,43 @@ class ReservaList(APIView):
             return Response(nueva_reserva.errors,status=status.HTTP_400_BAD_REQUEST)
  
 class ReservaDetail(APIView):
-    pass
+    def get_object(self,pk):
+        try:
+            return Reserva.object.get(pk=pk)
+        except Reserva.DoesNotExist:
+            status.HTTP_404_NOT_FOUND
+
+    @swagger_auto_schema(
+        operation_summary='Eliminar Reserva',
+    )
+    def eliminar_reserva(self,request,pk):
+        reserva=self.get_object(pk)
+        try :
+            reserva.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except: raise status.HTTP_204_NO_CONTENT
+    
+    @swagger_auto_schema(
+        operation_summary='Buscar Reserva', 
+    )
+    def buscar_reserva(self,pk):
+        reserva=self.get_object(pk)
+        serializer=ReservaSerializer(reserva)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    @swagger_auto_schema(
+        operation_summary='Actualizar Reserva', 
+    )
+    def actualizar_reserva(self,request,pk):
+        reserva=self.get_object(pk)
+        serializer=ReservaSerializer(reserva,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #Blog
 class BlogList(APIView):
